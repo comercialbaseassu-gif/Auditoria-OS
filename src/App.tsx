@@ -10,7 +10,7 @@ type ViewType = 'overview' | 'auditoria' | 'equipes' | 'dados';
 
 export default function App() {
   const [view, setView] = useState<ViewType>('overview');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(window.innerWidth < 768);
   const [loading, setLoading] = useState(false);
   const [statusText, setStatusText] = useState('Pronto');
   const [toast, setToast] = useState('');
@@ -380,7 +380,7 @@ export default function App() {
   return (
     <div className="flex h-screen bg-[#071017] text-[#F2F2F2] font-sans overflow-hidden">
       {/* Sidebar */}
-      <aside className={`flex-none flex flex-col bg-gradient-to-b from-[#081219] to-[#071017] border-r border-[#1d3642] transition-all duration-300 z-20 ${sidebarCollapsed ? 'w-[76px]' : 'w-[248px]'}`}>
+      <aside className={`flex-none flex flex-col bg-gradient-to-b from-[#081219] to-[#071017] border-r border-[#1d3642] transition-all duration-300 z-30 max-md:absolute max-md:h-full ${sidebarCollapsed ? 'w-0 md:w-[76px] overflow-hidden border-none md:border-solid' : 'w-[248px] shadow-2xl md:shadow-none'}`}>
         <div className="h-[58px] flex items-center gap-3 px-3 mx-2 mb-3 border-b border-[#1d3642]">
           <div className="w-9 h-9 flex-none rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 to-lime-500 text-[#041019] font-black shadow-lg shadow-cyan-500/20 text-lg">⚡</div>
           {!sidebarCollapsed && (
@@ -394,7 +394,7 @@ export default function App() {
           {navItems.map(item => (
             <button
               key={item.id}
-              onClick={() => { setView(item.id as ViewType); setPage(1); }}
+              onClick={() => { setView(item.id as ViewType); setPage(1); if(window.innerWidth < 768) setSidebarCollapsed(true); }}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-left border-none cursor-pointer transition-colors ${view === item.id ? 'bg-gradient-to-r from-cyan-500/20 to-cyan-500/5 text-white shadow-[inset_3px_0_0_#049DD9]' : 'text-[#9fb0b8] bg-transparent hover:bg-[#0d1e27] hover:text-white'} ${sidebarCollapsed ? 'justify-center' : ''}`}
             >
               <item.icon className="w-5 h-5 flex-none" />
@@ -414,8 +414,16 @@ export default function App() {
       </aside>
 
       {/* Main Area */}
-      <main className="flex-1 flex flex-col min-w-0">
-        <header className="flex-none h-[74px] px-6 border-b border-[#1d3642] flex items-center justify-between bg-[#071017d1] backdrop-blur-xl z-10">
+      <main className="flex-1 flex flex-col min-w-0 w-full relative">
+        {/* Mobile Header Menu Button */}
+        <div className="md:hidden flex items-center h-[58px] px-4 border-b border-[#1d3642] bg-[#071017]">
+          <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2 -ml-2 text-white">
+            <Menu className="w-6 h-6" />
+          </button>
+          <div className="font-extrabold ml-2">Auditoria OS</div>
+        </div>
+
+        <header className="flex-none min-h-[74px] p-4 md:px-6 border-b border-[#1d3642] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#071017d1] backdrop-blur-xl z-10 overflow-x-auto">
           <div>
             <div className="text-xl font-extrabold tracking-tight capitalize">{view.replace('-', ' ')}</div>
             <div className="text-xs text-[#9fb0b8] mt-1">Resumo executivo da execução operacional</div>
